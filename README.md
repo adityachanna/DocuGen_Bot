@@ -2,7 +2,6 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.8%2B-green.svg)
-![License](https://img.shields.io/badge/license-MIT-purple.svg)
 ![Last Updated](https://img.shields.io/badge/Last%20Updated-April%202025-orange.svg)
 
 > **A dual-approach framework for intelligent document analysis and generation, powered by cutting-edge multimodal AI models.**
@@ -36,14 +35,14 @@ DocuGen Bot transforms how organizations process and generate documents by combi
 
 | Feature | Approach 1: Google GenAI | Approach 2: LangChain Agent |
 |---------|--------------------------|------------------------------|
-| **Core Engine** | Gemini 2.0 Flash | Llama 4 Maverick 17B (via Groq) |
+| **Core Engine** | Gemini 2.0 Flash | Llama 4 Maverick (via Groq) |
 | **Input Processing** | Direct PDF bytes | Structured PDF partitioning |
 | **Content Understanding** | Embedded multimodal | Sequential text + image |
 | **External Knowledge** | Google Search API | Tavily Search API |
 | **Implementation Complexity** | Low | Medium-High |
 | **Customization Potential** | Limited | Extensive |
 | **Resource Requirements** | Minimal | Moderate |
-| **Processing Time** | Faster (8-12s) | Comprehensive (15-35s) |
+| **Total Time** | Faster (5-8s) | Comprehensive (10-14s) |
 | **Output Quality** | Good | Excellent |
 
 ---
