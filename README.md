@@ -148,18 +148,11 @@ We evaluated both approaches using a test suite of 50 diverse documents (technic
 
 | Metric | Google GenAI | LangChain Agent |
 |--------|-------------|-----------------|
-| **Content Accuracy** | 88% | 94% |
-| **Format Preservation** | 75% | 92% |
-| **Processing Speed** | 0.8s/page | 2.2s/page |
+| **Content Accuracy** | Good| Average |
+| **Processing Speed** | 0.8s/page | 2s/page |
 | **Handling Complex Images** | Good | Moderate |
-| **Code Block Formatting** | Basic | Advanced |
 | **Table Rendering** | Limited | Comprehensive |
 
-### Benchmark Results (Average of 50 Documents)
-
-<div align="center">
-  <img src="https://quickchart.io/chart?c={type:'radar',data:{labels:['Accuracy','Speed','Formatting','Image Handling','Customization','Cost Efficiency'],datasets:[{label:'Google GenAI',data:[88,95,75,90,60,95],backgroundColor:'rgba(54,162,235,0.2)',borderColor:'rgb(54,162,235)'},{label:'LangChain Agent',data:[94,75,92,80,95,70],backgroundColor:'rgba(255,99,132,0.2)',borderColor:'rgb(255,99,132)'}]}}" alt="Performance Comparison" width="60%"/>
-</div>
 
 ---
 
@@ -220,16 +213,9 @@ DocuGen_Bot/
 
 - [ ] **Fine-tuning Pipeline**: Domain-specific model adaptation for specialized documents
 - [ ] **Custom Template Engine**: Pre-built templates for common document types
-- [ ] **Advanced OCR Integration**: Support for AWS Textract and Azure Document Intelligence
 - [ ] **Multi-Document Analysis**: Compare and synthesize information across multiple PDFs
 - [ ] **Interactive Editing**: Web-based interface for post-generation document refinement
-- [ ] **Containerized Deployment**: Docker and Kubernetes configurations for cloud deployment
-
 ---
-
-## 📝 License & Attribution
-
-This project is released under the MIT License.
 
 ### Acknowledgments
 - Google Gemini API for multimodal document processing
