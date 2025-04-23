@@ -21,9 +21,8 @@ DocuGen Bot transforms how organizations process and generate documents by combi
 
 ## 🏗️ Architecture Overview
 
-<div align="center">
-  <img src="https://mermaid.ink/img/pako:eNp1ksFuwjAMhl_F8qkgFcohh1FtqCCNjVFpbL1EbmJK1CYhcVCF-u4jKYgxsUvs_P7_z7HdCyyshdILqltlsIJKIVcObSWUh1bAGnR0AgQ8rGrZgPc5-iS0RoXWaFEZnMHHAz_BaqiTQqEbzWEQQvuq1XsZdGTFxO1R1qNxZEzfkrmQCzJP8Np8ICPk7lxiOuavDR5qNKiL4KV5GV2x5sn073XCZCbFp7LdP15-OlY5V7ZBD2XUVH0gveOoHzRdVzvpLJa5-V8JW17vWElbF4i7ykP1jPE0SWbj-Sw1I-OtDkAbrqEMhNwgkVFOUdKwQlLLBvzE6bnVdaVxjDNGzvHrOpBIVt-Bk73v8w0pT1SbwJV_5-7pWLrS5GiMXl5dL0Fwp-QEYSfKbpS-IEYpkxSi6AUpnT1RtfgGa-C-JA" alt="DocuGen Architecture" width="80%"/>
-</div>
+![Architecture Flowchart_ lit py vs Program py(2)](https://github.com/user-attachments/assets/6cefaf4e-0cca-459f-856f-a2595cf35d66)
+
 
 ### Approach 1: Google GenAI (Efficient & Cost-Effective)
 > Direct multimodal processing with minimal overhead
