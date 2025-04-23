@@ -17,17 +17,15 @@ if UNSTRUCTURED_API_KEY:
     os.environ["UNSTRUCTURED_API_KEY"] = UNSTRUCTURED_API_KEY
 if TAVILY_API_KEY:
     os.environ["TAVILY_API_KEY"] = TAVILY_API_KEY
-
 def process_with_unstructured_api(file_path):
     """Process PDF using Unstructured API with simplified settings"""
     try:
         from langchain_unstructured import UnstructuredLoader
-        
         start_time = time.time()
         st.info("Processing with Unstructured API... This may take a minute.")
         loader = UnstructuredLoader(
             file_path=file_path,
-            strategy="high-res",  
+            strategy="hi_res",  
             partition_via_api=True,
             coordinates=False,  
         )
@@ -123,25 +121,39 @@ def main():
             if st.button("Generate Document"):
                 with st.spinner("Processing document... Please wait."):
                     try:
-                        web_search_results = ""
+        
                         if use_web_search and TAVILY_API_KEY:
                             with st.spinner("Searching the web for additional context..."):
                                 try:
-                                    search = TavilySearchResults(max_results=3)
-                                    search_results = search.invoke(prompt)
+                                    os.environ["TAVILY_API_KEY"] = TAVILY_API_KEY
+                                    search = TavilySearchResults(
+                                        max_results=3,
+                                        api_key=TAVILY_API_KEY  
+                                    )
+
+                                    search_query = f"Find information about: {prompt}"
+                                    search_results = search.invoke(search_query)
                                     
-                                    # Format search results
-                                    web_search_results = "\n\nWeb Search Results:\n"
-                                    for i, result in enumerate(search_results, 1):
-                                        title = result.get('title', 'No title')
-                                        content = result.get('content', 'No content')
-                                        url = result.get('url', 'No URL')
-                                        web_search_results += f"[{i}] {title}: {content}\nSource: {url}\n\n"
-                                    
-                                    st.info(f"Found {len(search_results)} relevant web results")
+                                    if search_results and len(search_results) > 0:
+                                        # Format search results
+                                        web_search_results = "\n\n### Web Search Results:\n"
+                                        for i, result in enumerate(search_results, 1):
+                                            title = result.get('title', 'No title')
+                                            content = result.get('content', 'No content')
+                                            url = result.get('url', 'No URL')
+                                            web_search_results += f"\n## [{i}] {title}\n{content}\nSource: {url}\n\n"
+                                        
+                                        st.info(f"Found {len(search_results)} relevant web results")
+                                    else:
+                                        st.warning("No web search results found.")
+                                        web_search_results = "\n\nWeb search was performed but no relevant results were found."
                                 except Exception as search_error:
-                                    st.warning(f"Web search failed: {search_error}")
+                                    st.warning(f"Web search failed: {str(search_error)}")
                                     web_search_results = ""
+                                    import traceback
+                                    print(f"Web search error details: {traceback.format_exc()}")
+                        else:
+                            web_search_results = ""  
                         system_message = SystemMessage(
                             content="""You are a document analysis expert. 
                             Analyze the provided PDF content carefully. 
@@ -156,7 +168,7 @@ def main():
                         if len(extracted_content) > max_content_length:
                             truncated_content += "\n...[content truncated due to length]..."
                         human_message = HumanMessage(
-                            content=f"{prompt}\n\nDocument content:\n{truncated_content}{web_search_results}"
+                            content=f"{prompt}\n\nDocument content:\n{truncated_content}\n\n{web_search_results if web_search_results else ''}"
                         )
                         
                         with st.spinner("Generating response with Groq... This may take a minute."):
