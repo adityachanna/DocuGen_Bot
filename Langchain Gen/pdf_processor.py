@@ -4,7 +4,6 @@ import tempfile
 from typing import Optional, Tuple, List
 import base64
 from dotenv import load_dotenv
-# Add Unstructured imports
 from unstructured.partition.pdf import partition_pdf
 from unstructured.partition.auto import partition
 from unstructured.staging.base import elements_to_text
@@ -20,41 +19,39 @@ load_dotenv()
 os.environ["TAVILY_API_KEY"] = os.getenv("TAVILY_API_KEY")
 os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 UNSTRUCTURED_API_KEY = os.getenv("UNSTRUCTURED_API_KEY")
-
-# Ensure directories exist
 def ensure_directory_exists(directory_path):
     """Create directory if it doesn't exist"""
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
         print(f"Created directory: {directory_path}")
 
-# Make sure temp_files directory exists
 ensure_directory_exists(os.path.join(os.getcwd(), "temp_files"))
 ensure_directory_exists(os.path.join(os.getcwd(), "output_docs"))
-
-# Add a fallback PDF extraction method that doesn't require Tesseract
 def extract_text_without_ocr(file_path):
     """Extract text from PDF without using OCR (doesn't require Tesseract)"""
     try:
-        # Use a simpler extraction method that doesn't depend on Tesseract
         elements = partition_pdf(
             file_path,
-            extract_images_in_pdf=True,  # Skip image extraction to avoid OCR
-            infer_table_structure=True,  # Skip table inference
-            strategy="fast",  # Use fast strategy which doesn't require OCR
+            extract_images_in_pdf=True,  
+            infer_table_structure=True,  
+            strategy="hi_res",  
             include_page_breaks=True,
+            ocr_languages=None,
         )
         return elements_to_text(elements)
     except Exception as e:
         print(f"Error in simple PDF extraction: {e}")
-        # Last resort - try using basic extraction if all else fails
         try:
             from PyPDF2 import PdfReader
             reader = PdfReader(file_path)
             text = ""
             for page in reader.pages:
-                text += page.extract_text() + "\n"
-            return text
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+                else:
+                    text += "[Page contains no extractable text]\n"
+            return text if text.strip() else "No text could be extracted from this PDF."
         except Exception as e2:
             print(f"Error in PyPDF2 extraction: {e2}")
             return "Error extracting text from PDF. Consider installing PyPDF2 with 'pip install PyPDF2'."
@@ -79,14 +76,11 @@ def encode_image_to_base64(image_path):
 def process_pdf(file_path):
     """Process PDF using Unstructured for text extraction with OCR capabilities"""
     try:
-        # Check if file exists and handle relative paths
+     
         if isinstance(file_path, str):
-            # Check if it's a relative path and convert to absolute
             if not os.path.isabs(file_path):
-                # Try in current directory first
                 abs_path = os.path.abspath(file_path)
                 if not os.path.exists(abs_path):
-                    # Try in temp_files directory
                     temp_path = os.path.join(os.getcwd(), "temp_files", os.path.basename(file_path))
                     if os.path.exists(temp_path):
                         file_path = temp_path
@@ -94,46 +88,36 @@ def process_pdf(file_path):
                         raise FileNotFoundError(f"File '{file_path}' not found at '{abs_path}' or '{temp_path}'!")
                 else:
                     file_path = abs_path
-            
-            # Final check if file exists
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"File '{file_path}' not found!")
-        
-        # Create a temporary file if file_path is bytes
         if isinstance(file_path, bytes):
-            # Create temp_files directory if it doesn't exist
             temp_dir = os.path.join(os.getcwd(), "temp_files")
             ensure_directory_exists(temp_dir)
-            
-            # Create a temporary file in the temp_files directory
             temp_file_path = os.path.join(temp_dir, f"temp_upload_{os.urandom(4).hex()}.pdf")
             with open(temp_file_path, "wb") as temp_file:
                 temp_file.write(file_path)
             file_path = temp_file_path
             print(f"Created temporary file: {file_path}")
         
-        # Try extracting with OCR first
         try:
             elements = partition_pdf(
                 file_path, 
                 extract_images_in_pdf=True,
                 infer_table_structure=True,
-                strategy="hi_res",  # Use hi_res for better OCR quality
-                vision_model="chipper",  # For better image understanding
+                strategy="hi_res",  
+                vision_model="chipper",  
+                
                 include_page_breaks=True,
             )
             extracted_text = elements_to_text(elements)
         except Exception as ocr_error:
-            # Check if error is related to Tesseract
             if "tesseract is not installed" in str(ocr_error):
                 print("Tesseract OCR not available. Falling back to basic PDF extraction...")
                 extracted_text = extract_text_without_ocr(file_path)
                 elements = None
             else:
-                # Re-raise if it's not a Tesseract error
                 raise
         
-        # Return both the file path for multimodal approach and extracted text for text-based approach
         return {
             "file_path": file_path,
             "extracted_text": extracted_text,
@@ -143,7 +127,6 @@ def process_pdf(file_path):
         print(f"Error processing PDF: {e}")
         raise
 
-# Add the missing function that lit.py is trying to import
 def extract_pdf_content(file_path) -> Tuple[str, List[str]]:
     """
     Extract text and images from a PDF file.
@@ -157,15 +140,12 @@ def extract_pdf_content(file_path) -> Tuple[str, List[str]]:
     try:
         pdf_data = process_pdf(file_path)
         extracted_text = pdf_data["extracted_text"]
-        
-        # Create a base64 encoding of the PDF for images
+      
         images = []
         try:
-            # Add the whole PDF as an image
+
             pdf_base64 = encode_image_to_base64(pdf_data["file_path"])
             images.append(pdf_base64)
-            
-            # You could also extract individual images here if needed
         except Exception as e:
             print(f"Error encoding PDF as image: {e}")
         
